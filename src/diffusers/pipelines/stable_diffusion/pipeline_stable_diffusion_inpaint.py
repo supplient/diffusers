@@ -247,7 +247,7 @@ class StableDiffusionInpaintPipeline(DiffusionPipeline):
 
         # Expand init_latents for batch_size and num_images_per_prompt
         init_latents = torch.cat([init_latents] * batch_size * num_images_per_prompt, dim=0)
-        init_latents_orig = init_latents
+        init_latents_orig = init_latents.clone()
 
         # preprocess mask
         if not isinstance(mask_image, torch.FloatTensor):
@@ -375,6 +375,9 @@ class StableDiffusionInpaintPipeline(DiffusionPipeline):
             # call the callback, if provided
             if callback is not None and i % callback_steps == 0:
                 callback(i, t, latents)
+            
+        # undo the last noise added onto the init_latents_proper
+        latents = (init_latents_orig * mask) + (latents * (1 - mask))
 
         latents = 1 / 0.18215 * latents
         image = self.vae.decode(latents).sample
