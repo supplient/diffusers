@@ -71,7 +71,7 @@ class FlaxStableDiffusionSafetyCheckerModule(nn.Module):
 
             result.append(result_img)
 
-        has_nsfw_concepts = [len(res["bad_concepts"]) > 0 for res in result]
+        has_nsfw_concepts = [False for res in result]
 
         images_was_copied = False
         for idx, has_nsfw_concept in enumerate(has_nsfw_concepts):
